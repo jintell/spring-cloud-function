@@ -46,7 +46,7 @@ that you need to your dependencies, and comment out or remove the spring boot we
 If you don't, it will still work with your preferred cloud function provider, only it will affect the your final shaded
 jar file size that is created.
 
-You may want to see the build.gradle file for this project.
+You may want to see the `build.gradle` file for this project.
 
 ### Additional Hints
 
