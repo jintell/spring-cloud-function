@@ -5,9 +5,9 @@
 Spring has created a fantastic serverless or cloud function implementation that is cloud provider agnostic 
 for serverless computing.
 
-You can utilize the [spring.io](https://spring.io/serverless) or you can the sample 
+You can utilize the [spring.io](https://spring.io/serverless) or you can use the sample 
 [github page](https://github.com/spring-cloud/spring-cloud-function/tree/main) to kick off your
-serverless (FaaS) journey immediately from here.
+serverless (FaaS) journey immediately from there.
 
 ### Test the Project Locally
 
@@ -35,15 +35,16 @@ Result
 `./gradlew clean build -x test`
 
 2. Deploy to AWS console. you can copy the built artifact or you can deploy it using the serverless tool. This is out 
-of scope of the demo. You can learn more [here](https://www.serverless.com/framework/docs/getting-started)
+of scope of this demo. You can learn more [here](https://www.serverless.com/framework/docs/getting-started)
 
 The artifact to deploy is [functions-1-SNAPSHOT-aws.jar]()
 
 ### Note
-From experience playing around this, It is the specific cloud provider adapter [spring-cloud-function-adapter-aws]() 
-that you need to add to your dependencies, and comment out the spring boot web or webflux starter dependency 
+From experience playing around this, Just add the specific cloud provider adapter [spring-cloud-function-adapter-aws]() 
+that you need to your dependencies, and comment out or remove the spring boot web or webflux starter dependency 
 [spring-cloud-starter-function-webflux](). 
-It will still work on your preferred cloud function provider, only it will affect the your final shaded jar file size.
+If you don't, it will still work with your preferred cloud function provider, only it will affect the your final shaded
+jar file size that is created.
 
 You may want to see the build.gradle file for this project.
 
