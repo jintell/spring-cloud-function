@@ -2,7 +2,8 @@
 
 ### Spring Cloud Function implementation and and deployment to AWS LAMBDA
 
-Spring has create a fantastic cloud provider agnostic implementation for serverless computing.
+Spring has created a fantastic serverless or cloud function implementation that is cloud provider agnostic 
+for serverless computing.
 
 You can utilize the [spring.io](https://spring.io/serverless) or you can the sample 
 [github page](https://github.com/spring-cloud/spring-cloud-function/tree/main) to kick off your
