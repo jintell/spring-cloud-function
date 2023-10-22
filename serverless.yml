@@ -1,0 +1,23 @@
+service: spring-cloud-function-aws-demo
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: java17
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add packaging information here
+package:
+  artifact: build/libs/functions-1-SNAPSHOT-aws.jar
+
+functions:
+  cloud-app:
+    url: true # a Public URL will be automatically created
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+# Handler is coming from spring-cloud-function-adapter-aws maven pom dependency
+# This always remains the same and acts as main method/starting point of the Lambda function
+

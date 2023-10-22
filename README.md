@@ -39,6 +39,23 @@ of scope of this demo. You can learn more [here](https://www.serverless.com/fram
 
 The artifact to deploy is [functions-1-SNAPSHOT-aws.jar]()
 
+3. Test the aws deployment:
+
+`curl https://h2gset4x2rgrfx3ovkiacnosl40cynxp.lambda-url.us-east-1.on.aws/ -H 'spring.cloud.function.definition: reverse'
+-d 'Hello World' -H 'Content-Type: text/plain'`
+
+Result:
+
+dlroW olleH
+
+`curl https://h2gset4x2rgrfx3ovkiacnosl40cynxp.lambda-url.us-east-1.on.aws/ -H 'spring.cloud.function.definition: uppercase' 
+-d 'Hello World' -H 'Content-Type: text/plain'`
+
+Result:
+
+HELLO WORLD
+
+
 ### Note
 From experience playing around this, Just add the specific cloud provider adapter [spring-cloud-function-adapter-aws]() 
 that you need to your dependencies, and comment out or remove the spring boot web or webflux starter dependency 
@@ -60,7 +77,8 @@ Also, if you have more than one function in your configuration, add a new `Key`
 
 I will suggest your artifact is uploaded to S3 and create your functions from the bucket, instead of uploading for 
 each function you want to create. I will also recommend using the serverless tool, which will let you utilize the 
-AWS cloud formation that help you to manage your resources
+AWS cloud formation that help you to manage your resources, you can use it to automatically generate a function public 
+url for you. Something like this: https://h2gset4x2rgrfx3ovkiacnosl40cynxp.lambda-url.us-east-1.on.aws/ 
 
 
 

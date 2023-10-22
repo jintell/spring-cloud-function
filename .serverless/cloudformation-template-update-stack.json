@@ -1,0 +1,251 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "CloudDashappLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/spring-cloud-function-aws-demo-dev-cloud-app"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "spring-cloud-function-aws-demo",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/spring-cloud-function-aws-demo-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/spring-cloud-function-aws-demo-dev*:*:*"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "spring-cloud-function-aws-demo",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "CloudDashappLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/spring-cloud-function-aws-demo/dev/1697958647218-2023-10-22T07:10:47.218Z/functions-1-SNAPSHOT-aws.jar"
+        },
+        "Handler": "org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest",
+        "Runtime": "java17",
+        "FunctionName": "spring-cloud-function-aws-demo-dev-cloud-app",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "CloudDashappLogGroup"
+      ]
+    },
+    "CloudDashappLambdaVersionE4EBDfVnOJ50ROocjJYHQB1lTos8ZIZOjZy9KALNg": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CloudDashappLambdaFunction"
+        },
+        "CodeSha256": "Jp3SmP9nzBPedGue/uMEmQenlpPAyYKdpcEiG0uA4Nk="
+      }
+    },
+    "CloudDashappLambdaFunctionUrl": {
+      "Type": "AWS::Lambda::Url",
+      "Properties": {
+        "AuthType": "NONE",
+        "TargetFunctionArn": {
+          "Fn::GetAtt": [
+            "CloudDashappLambdaFunction",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "CloudDashappLambdaPermissionFnUrl": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "CloudDashappLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunctionUrl",
+        "Principal": "*",
+        "FunctionUrlAuthType": "NONE"
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-spring-cloud-function-aws-demo-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "CloudDashappLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CloudDashappLambdaVersionE4EBDfVnOJ50ROocjJYHQB1lTos8ZIZOjZy9KALNg"
+      },
+      "Export": {
+        "Name": "sls-spring-cloud-function-aws-demo-dev-CloudDashappLambdaFunctionQualifiedArn"
+      }
+    },
+    "CloudDashappLambdaFunctionUrl": {
+      "Description": "Lambda Function URL",
+      "Value": {
+        "Fn::GetAtt": [
+          "CloudDashappLambdaFunctionUrl",
+          "FunctionUrl"
+        ]
+      },
+      "Export": {
+        "Name": "sls-spring-cloud-function-aws-demo-dev-CloudDashappLambdaFunctionUrl"
+      }
+    }
+  }
+}
